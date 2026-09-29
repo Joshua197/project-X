@@ -90,6 +90,8 @@
   .opt-other { flex-wrap: wrap; }
   .opt-other .other-text { flex: 1 1 12rem; width: auto; padding: .4rem .6rem; }
   .toggle { margin-top: .5rem; padding-left: 0; }
+  .q.follow { border-left: 3px solid var(--line); padding-left: .9rem; }
+  .q[hidden] { display: none; }
   .q-error { color: var(--danger); font-size: .9rem; margin: .35rem 0 0; min-height: 0; }
   .q-error:empty { display: none; }
   input:disabled { opacity: .5; }
@@ -154,46 +156,136 @@
    ========================================================= */
 const CONFIG = {
   API_URL: 'https://script.google.com/macros/s/AKfycbzeTTHJCopjIZngXSw4i7-naO2qbI8L6XmmCA3lz9rlfB2RfuRkjdtK0JtMs_kTWrRv/exec',
-  GROUP_NAME: 'Project X Investment Plan'
+  GROUP_NAME: 'Our investment plan'
 };
 
 /* =========================================================
    2. QUESTIONS: edit freely. Types: choice, checkbox, short, paragraph
    ========================================================= */
+// Follow-up questions use showIf to appear only for certain answers
+const SACCO_YES = { id: 'sacco_member', in: ['Yes, I am a member now', 'Yes, I used to be a member'] };
+const GROUP_YES = { id: 'group_member', in: ['Yes, currently', 'I used to be'] };
+const EXTRA_YES = { id: 'extra_contrib', in: ['Yes'] };
+
+const S_CONTRIB = 'Contributions and membership rules';
+const S_SACCO = 'Choosing a SACCO and managing the money';
+const S_GOALS = 'Goals and investment direction';
+const S_GROUPS = 'Experience with investment groups';
+
 const QUESTIONS = [
-  { id: 'amount', section: 'Contributions', type: 'choice', required: true, other: true,
+  /* ---- Contributions and membership rules ---- */
+  { id: 'amount', section: S_CONTRIB, type: 'choice', required: true, other: true,
     label: 'How much are you comfortable contributing per month?',
-    options: ['KES 2,000', 'KES 5,000', 'KES 10,000', 'KES 20,000'] },
-  { id: 'frequency', section: 'Contributions', type: 'choice', required: true, other: true,
+    options: ['KES 10,000', 'KES 15,000', 'KES 20,000', 'KES 30,000', 'KES 40,000', 'KES 50,000'] },
+  { id: 'frequency', section: S_CONTRIB, type: 'choice', required: true, other: true,
     label: 'How often should we contribute?',
     options: ['Monthly', 'Quarterly'] },
-  { id: 'pool_period', section: 'Contributions', type: 'choice', required: true, other: true,
+  { id: 'pool_period', section: S_CONTRIB, type: 'choice', required: true, other: true,
     label: 'For how long should we pool money before we invest or review progress?',
     options: ['6 months', '1 year', '2 years', '3 years or more'] },
-  { id: 'start', section: 'Contributions', type: 'choice', required: true, other: true,
+  { id: 'start', section: S_CONTRIB, type: 'choice', required: true, other: true,
     label: 'When should we start contributing?',
-    options: ['October 2026', 'November 2026', 'January 2027'] },
+    options: ['October 2026', 'November 2026', 'December 2026', 'January 2027'] },
+  { id: 'commit', section: S_CONTRIB, type: 'choice', required: true,
+    label: 'Can you commit to contributing for the full period you chose?',
+    help: 'An honest answer helps us plan. Nobody is judged for saying "not sure".',
+    options: ['Yes', 'Probably', 'Not sure'] },
+  { id: 'payment_method', section: S_CONTRIB, type: 'checkbox', required: true, other: true,
+    label: 'How will you send your contributions?',
+    options: ['M-Pesa', 'Bank transfer', 'International transfer from outside Kenya'] },
+  { id: 'extra_contrib', section: S_CONTRIB, type: 'choice', required: true,
+    label: 'Should members be able to contribute more than the agreed amount?',
+    options: ['Yes', 'No'] },
+  { id: 'extra_share', section: S_CONTRIB, type: 'choice', required: true, other: true, showIf: EXTRA_YES,
+    label: 'Should extra money earn a bigger share of the returns?',
+    options: ['Yes, returns should match what each person put in', 'No, returns should be shared equally'] },
+  { id: 'missed', section: S_CONTRIB, type: 'choice', required: true, other: true,
+    label: 'What should happen if someone misses a contribution?',
+    options: ['A fixed fine', 'A grace period, then a fine', 'No penalty, but it is recorded'] },
+  { id: 'exit', section: S_CONTRIB, type: 'choice', required: true, other: true,
+    label: 'If a member wants to leave early, what should they get back?',
+    options: ['Their full contributions', 'Their contributions minus a penalty', 'Their contributions, but only after a notice period'] },
+  { id: 'emergency_loans', section: S_CONTRIB, type: 'choice', required: true, other: true,
+    label: 'Should members be able to borrow from the pool in an emergency?',
+    options: ['Yes, with interest', 'Yes, interest free', 'No'] },
+  { id: 'next_of_kin', section: S_CONTRIB, type: 'choice', required: false, other: true,
+    label: "In the event of a member's death or long-term incapacity, what should happen to their share?",
+    help: 'Optional. Uncomfortable to ask, but much easier to agree on now than later.',
+    options: ['It goes to a next of kin the member names in advance', 'It is paid to their family under the group rules', 'Not sure'] },
 
-  { id: 'sacco', section: 'Choosing a SACCO', type: 'paragraph', required: true,
-    label: 'Which SACCO(s) do you propose, and why?' },
-  { id: 'sacco_criteria', section: 'Choosing a SACCO', type: 'checkbox', required: true, other: true,
-    label: 'What matters most to you when choosing a SACCO?',
-    options: ['Dividend and interest rate history', 'Loan multiplier on savings', 'SASRA regulation',
-              'Mobile and digital access', 'Entry fees and minimum share capital', 'Whether we all qualify for membership'] },
+  /* ---- Choosing a SACCO and managing the money ---- */
+  { id: 'sacco', section: S_SACCO, type: 'paragraph', required: true,
+    label: 'Which SACCO(s) do you propose, and why?',
+    help: 'For example, Stima Sacco or Yetu Sacco. Mention anything you know about their returns, fees or membership rules.' },
+  { id: 'sacco_member', section: S_SACCO, type: 'choice', required: true,
+    label: 'Are you a member of a SACCO, or have you used one before?',
+    options: ['Yes, I am a member now', 'Yes, I used to be a member', 'No'] },
+  { id: 'sacco_which', section: S_SACCO, type: 'short', required: true, showIf: SACCO_YES,
+    label: 'Which SACCO(s)?' },
+  { id: 'sacco_review', section: S_SACCO, type: 'paragraph', required: true, showIf: SACCO_YES,
+    label: 'Briefly, what has your experience with that SACCO been like?',
+    help: 'For example: dividends, loans, customer service, and how easy it is to join or withdraw.' },
+  { id: 'hold_money', section: S_SACCO, type: 'choice', required: true, other: true,
+    label: 'How should we hold the money?',
+    help: 'SACCO membership is usually individual. Joining as a group usually needs a registered group, a constitution and signatories.',
+    options: ['Register as a group and open a group SACCO or bank account', 'Each member joins the SACCO individually and we track contributions together', 'Not sure'] },
+  { id: 'signatories', section: S_SACCO, type: 'choice', required: true, other: true,
+    label: 'How many signatories should be needed to withdraw money?',
+    options: ['2 officials', '3 officials', 'All members must agree'] },
+  { id: 'decisions', section: S_SACCO, type: 'choice', required: true, other: true,
+    label: 'How should big decisions be made?',
+    options: ['Simple majority', 'Two-thirds majority', 'Everyone must agree'] },
+  { id: 'roles', section: S_SACCO, type: 'checkbox', required: true,
+    label: 'Would you be willing to take on a role?',
+    options: ['Chair', 'Treasurer', 'Secretary', 'None for now'] },
+  { id: 'update_freq', section: S_SACCO, type: 'choice', required: true, other: true,
+    label: 'How often should we get a financial update?',
+    options: ['Monthly', 'Quarterly'] },
+  { id: 'update_how', section: S_SACCO, type: 'checkbox', required: true, other: true,
+    label: 'How should updates be shared?',
+    options: ['WhatsApp summary', 'Shared spreadsheet', 'Meeting (in person or online)'] },
 
-  { id: 'target', section: 'Goals and investment direction', type: 'short', required: true,
+  /* ---- Goals and investment direction ---- */
+  { id: 'target', section: S_GOALS, type: 'short', required: true,
     label: 'What should our end-goal target amount be (in KES)?', placeholder: 'e.g. 2,000,000' },
-  { id: 'target_time', section: 'Goals and investment direction', type: 'choice', required: true, other: true,
+  { id: 'target_time', section: S_GOALS, type: 'choice', required: true, other: true,
     label: 'By when should we aim to reach that target?',
     options: ['1 year', '2 years', '3 years', '5 years or more'] },
-  { id: 'two_million', section: 'Goals and investment direction', type: 'paragraph', required: true,
+  { id: 'risk', section: S_GOALS, type: 'choice', required: true,
+    label: "What's your appetite for risk?",
+    options: ['Low: protect the money', 'Medium: some risk for better returns', 'High: aim for bigger returns'] },
+  { id: 'two_million', section: S_GOALS, type: 'paragraph', required: true,
     label: 'Challenge: if we had KES 2 million today, what would you invest it in, and what could it realistically generate for us?' },
-  { id: 'short_term', section: 'Goals and investment direction', type: 'choice', required: true,
+  { id: 'short_term', section: S_GOALS, type: 'choice', required: true,
     label: 'Would pursuing a short or medium-term investment alongside our long-term goal help or hurt us?',
     options: ['It would complement our long-term goal', 'It would distract from our long-term goal', 'Not sure'] },
-  { id: 'short_term_why', section: 'Goals and investment direction', type: 'paragraph', required: false,
+  { id: 'short_term_why', section: S_GOALS, type: 'paragraph', required: false,
     label: 'Briefly explain your answer above.' },
 
+  /* ---- Experience with investment groups ---- */
+  { id: 'group_member', section: S_GROUPS, type: 'choice', required: true,
+    label: 'Are you part of an existing investment group (chama)?',
+    options: ['Yes, currently', 'I used to be', 'No'] },
+  { id: 'group_focus', section: S_GROUPS, type: 'paragraph', required: true, showIf: GROUP_YES,
+    label: 'What does (or did) the group invest in?' },
+  { id: 'group_duration', section: S_GROUPS, type: 'choice', required: true, showIf: GROUP_YES,
+    label: 'How long has the group been running?',
+    options: ['Less than 1 year', '1 to 3 years', '3 to 5 years', 'More than 5 years'] },
+  { id: 'group_capital', section: S_GROUPS, type: 'short', required: false, showIf: GROUP_YES,
+    label: 'Roughly how much starting capital did the group begin with (in KES)?',
+    help: 'Optional. A rough figure is fine.' },
+  { id: 'group_structure', section: S_GROUPS, type: 'choice', required: true, other: true, showIf: GROUP_YES,
+    label: 'How does the group invest?',
+    options: ['As one shared pot', 'Each member invests individually, with group support', 'A mix of both'] },
+  { id: 'group_books', section: S_GROUPS, type: 'checkbox', required: true, other: true, showIf: GROUP_YES,
+    label: 'How are the books and records kept?',
+    options: ['A written ledger or notebook', 'A shared spreadsheet', 'A chama app such as Chamasoft', 'Through SACCO or bank statements', 'Only the treasurer keeps them'] },
+  { id: 'group_challenges', section: S_GROUPS, type: 'paragraph', required: true, showIf: GROUP_YES,
+    label: 'What challenges has the group faced?' },
+  { id: 'group_lessons', section: S_GROUPS, type: 'paragraph', required: true, showIf: GROUP_YES,
+    label: 'What lessons would you bring into our group?' },
+
+  /* ---- Anything else ---- */
   { id: 'other_ideas', section: 'Anything else', type: 'paragraph', required: false,
     label: 'Any other ideas, concerns, or suggestions?' }
 ];
@@ -326,19 +418,31 @@ function optionsHTML(q, val) {
 
 function questionHTML(q, val) {
   const req = q.required ? '<span class="req" title="Required">*</span>' : '';
+  const help = [q.help, q.type === 'checkbox' ? 'Choose all that apply.' : ''].filter(Boolean)
+    .map(t => `<p class="help">${esc(t)}</p>`).join('');
+  const cond = q.showIf ? ' data-cond="1" hidden' : '';
   if (q.type === 'choice' || q.type === 'checkbox') {
-    return `<fieldset class="q" id="q_${q.id}">
+    return `<fieldset class="q${q.showIf ? ' follow' : ''}" id="q_${q.id}"${cond}>
       <legend>${esc(q.label)}${req}</legend>
-      ${q.type === 'checkbox' ? '<p class="help">Choose all that apply.</p>' : ''}
+      ${help}
       <div class="opts">${optionsHTML(q, val)}</div>
       <p class="q-error" role="alert"></p></fieldset>`;
   }
   const field = q.type === 'paragraph'
     ? `<textarea id="f_${q.id}" name="${q.id}" rows="4">${esc(val || '')}</textarea>`
     : `<input id="f_${q.id}" name="${q.id}" type="text" value="${esc(val || '')}" ${q.placeholder ? `placeholder="${esc(q.placeholder)}"` : ''}>`;
-  return `<div class="q" id="q_${q.id}">
-    <label class="q-label" for="f_${q.id}">${esc(q.label)}${req}</label>${field}
+  return `<div class="q${q.showIf ? ' follow' : ''}" id="q_${q.id}"${cond}>
+    <label class="q-label" for="f_${q.id}">${esc(q.label)}${req}</label>${help}${field}
     <p class="q-error" role="alert"></p></div>`;
+}
+
+function isVisible(q, form) {
+  if (!q.showIf) return true;
+  const sel = form.querySelector(`input[name="${q.showIf.id}"]:checked`);
+  return !!sel && q.showIf.in.includes(sel.value);
+}
+function applyConditions(form) {
+  QUESTIONS.filter(q => q.showIf).forEach(q => { form.querySelector(`#q_${q.id}`).hidden = !isVisible(q, form); });
 }
 
 function collect(form) {
@@ -348,6 +452,7 @@ function collect(form) {
     return t ? 'Other: ' + t : '';
   };
   for (const q of QUESTIONS) {
+    if (!isVisible(q, form)) continue;
     let v;
     if (q.type === 'choice') {
       const sel = form.querySelector(`input[name="${q.id}"]:checked`);
@@ -400,6 +505,8 @@ async function renderAnswer() {
   const anon = document.getElementById('f_anon');
   const syncAnon = () => { nameInput.disabled = anon.checked; };
   anon.addEventListener('change', syncAnon); syncAnon();
+  applyConditions(form);
+  form.addEventListener('change', () => applyConditions(form));
 
   // Typing in an "Other" box selects the Other option automatically.
   form.querySelectorAll('.other-text').forEach(t => t.addEventListener('input', () => {
@@ -436,7 +543,8 @@ async function renderAnswer() {
 
 /* ---------- Group results ---------- */
 function resultHTML(q, rs) {
-  const answered = rs.filter(x => x.answers && x.answers[q.id] !== undefined && x.answers[q.id] !== '');
+  const eligible = q.showIf ? rs.filter(x => x.answers && q.showIf.in.includes(x.answers[q.showIf.id])) : rs;
+  const answered = eligible.filter(x => x.answers && x.answers[q.id] !== undefined && x.answers[q.id] !== '');
   let body;
   if (!answered.length) {
     body = '<p class="muted small">No answers yet.</p>';
@@ -462,13 +570,16 @@ function resultHTML(q, rs) {
   }
   const note = q.type === 'checkbox' ? ' People could choose more than one.' : '';
   return `<div class="rq"><h3>${esc(q.label)}</h3>
-    <p class="muted small">${answered.length} of ${rs.length} answered.${note}</p>${body}</div>`;
+    <p class="muted small">${answered.length} of ${eligible.length} answered.${note}</p>${body}</div>`;
 }
 
 /* ---------- Analysis ---------- */
 const SHORT_LABELS = {
   amount: 'Monthly amount', frequency: 'How often', pool_period: 'Pooling period', start: 'Start date',
-  target_time: 'Time to target', short_term: 'Short-term investment'
+  commit: 'Can commit for the full period', missed: 'Missed contributions', exit: 'Leaving early',
+  emergency_loans: 'Emergency loans', hold_money: 'Holding the money', signatories: 'Signatories',
+  decisions: 'Decision rule', update_freq: 'Financial updates', target_time: 'Time to target',
+  risk: 'Risk appetite', short_term: 'Short-term investment'
 };
 
 // "KES 5,000", "2M", "2 million", "Other: 7500" -> number
