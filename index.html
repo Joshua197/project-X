@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Our investment plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #EEF3F0;
+    --surface: #FFFFFF;
+    --ink: #13261E;
+    --muted: #56675E;
+    --line: #D3DDD7;
+    --accent: #1F7A5A;
+    --accent-ink: #FFFFFF;
+    --gold: #C9A227;
+    --track: #E4EBE7;
+    --danger: #B3261E;
+    color-scheme: light dark;
+    font-family: 'Figtree', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0E1814;
+      --surface: #16231D;
+      --ink: #E6EFEA;
+      --muted: #9DB0A6;
+      --line: #2A3B33;
+      --accent: #4CC195;
+      --accent-ink: #0B1A13;
+      --gold: #E0BD4A;
+      --track: #22322A;
+      --danger: #F2B8B5;
+    }
+  }
+  *, *::before, *::after { box-sizing: inherit; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body { margin: 0; background: var(--bg); color: var(--ink); line-height: 1.55; font-size: 1rem; }
+  h1, h2, h3 { font-family: 'Bricolage Grotesque', 'Figtree', system-ui, sans-serif; line-height: 1.15; margin: 0; }
+  button, input, textarea { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+  .wrap { max-width: 720px; margin: 0 auto; padding: 1.25rem 1rem 4rem; }
+
+  /* PIN screen */
+  .pin { min-height: 80vh; display: flex; flex-direction: column; justify-content: center; gap: 1rem; max-width: 26rem; }
+  .pin h1 { font-size: clamp(2.2rem, 7vw, 3.2rem); font-weight: 700; letter-spacing: -0.02em; }
+  .pin p { color: var(--muted); margin: 0; }
+  .pin form { display: grid; gap: .6rem; margin-top: .75rem; }
+  .pin label { font-weight: 600; }
+  .pin-input {
+    font-family: 'Bricolage Grotesque', monospace; font-size: 2rem; letter-spacing: .45em;
+    padding: .6rem .9rem; border: 2px solid var(--line); border-radius: 12px; background: var(--surface); width: 100%;
+  }
+  .pin-input:focus { border-color: var(--accent); outline: none; }
+
+  /* Header and tabs */
+  .top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .75rem 1rem; margin-bottom: 1.25rem; }
+  .top h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.01em; }
+  .tabs { display: flex; gap: .25rem; background: var(--track); padding: .25rem; border-radius: 999px; }
+  .tabs button { border: 0; background: transparent; padding: .45rem 1rem; border-radius: 999px; cursor: pointer; font-weight: 600; color: var(--muted); }
+  .tabs button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+  .lock { border: 0; background: none; color: var(--muted); cursor: pointer; text-decoration: underline; padding: .25rem; }
+
+  /* Panels */
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 1.25rem 1.25rem .5rem; margin-bottom: 1rem; }
+  .panel h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; }
+
+  /* Questions */
+  .q { border: 0; margin: 0 0 1.4rem; padding: 0; min-width: 0; }
+  .q legend, .q-label { display: block; font-weight: 600; margin-bottom: .5rem; padding: 0; }
+  .req { color: var(--danger); margin-left: .2rem; }
+  .help { color: var(--muted); font-size: .9rem; margin: -.3rem 0 .5rem; }
+  .q input[type="text"], .q textarea {
+    width: 100%; padding: .6rem .75rem; border: 1.5px solid var(--line); border-radius: 10px; background: var(--bg);
+  }
+  .q textarea { resize: vertical; min-height: 6rem; }
+  .q input[type="text"]:focus, .q textarea:focus { border-color: var(--accent); outline: none; }
+  .opts { display: grid; gap: .35rem; }
+  .opt { display: flex; align-items: center; gap: .6rem; padding: .45rem .6rem; border-radius: 10px; cursor: pointer; }
+  .opt:hover { background: var(--track); }
+  .opt input[type="radio"], .opt input[type="checkbox"] { accent-color: var(--accent); width: 1.1rem; height: 1.1rem; flex: none; margin: 0; }
+  .opt-other { flex-wrap: wrap; }
+  .opt-other .other-text { flex: 1 1 12rem; width: auto; padding: .4rem .6rem; }
+  .toggle { margin-top: .5rem; padding-left: 0; }
+  .q-error { color: var(--danger); font-size: .9rem; margin: .35rem 0 0; min-height: 0; }
+  .q-error:empty { display: none; }
+  input:disabled { opacity: .5; }
+
+  /* Buttons */
+  .primary { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 12px; padding: .75rem 1.4rem; font-weight: 600; cursor: pointer; }
+  .primary:disabled { opacity: .6; cursor: wait; }
+  .ghost { background: transparent; border: 1.5px solid var(--line); border-radius: 10px; padding: .4rem .9rem; cursor: pointer; font-weight: 600; }
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 1rem; }
+  .save-status { margin: 0; color: var(--muted); }
+
+  /* Results */
+  .summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+  .summary p { margin: 0; font-size: 1.05rem; }
+  .rq { margin-bottom: 1.75rem; }
+  .rq h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: .2rem; }
+  .small { font-size: .88rem; }
+  .muted { color: var(--muted); margin: 0 0 .6rem; }
+  .bar-row { margin-bottom: .7rem; }
+  .bar-head { display: flex; justify-content: space-between; gap: 1rem; font-weight: 500; }
+  .count { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .bar { height: .65rem; background: var(--track); border-radius: 999px; overflow: hidden; margin: .25rem 0; }
+  .bar span { display: block; height: 100%; background: var(--gold); border-radius: 999px; transform-origin: left; animation: grow .6s ease-out both; }
+  @keyframes grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  @media (prefers-reduced-motion: reduce) { .bar span { animation: none; } }
+  .who { color: var(--muted); font-size: .85rem; margin: 0; }
+  .quotes { list-style: none; padding: 0; margin: 0; display: grid; gap: .6rem; }
+  .quotes li { border-left: 3px solid var(--gold); padding: .2rem 0 .2rem .8rem; }
+  .quotes p { margin: 0 0 .15rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .status { color: var(--muted); }
+  .error-box { border: 1.5px solid var(--danger); color: var(--danger); border-radius: 12px; padding: 1rem; }
+  .notice { background: var(--surface); border-left: 4px solid var(--accent); border-radius: 10px; padding: .8rem 1rem; margin-bottom: 1rem; }
+  .analysis h2 { margin-bottom: .35rem; }
+  .analysis .lede { color: var(--muted); margin: 0 0 1rem; font-size: .92rem; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: .75rem; margin-bottom: 1.4rem; }
+  .stat { background: var(--bg); border-radius: 12px; padding: .8rem .9rem; }
+  .stat-value { font-family: 'Bricolage Grotesque', 'Figtree', sans-serif; font-weight: 700; font-size: 1.45rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
+  .stat-label { color: var(--muted); font-size: .86rem; margin: .2rem 0 0; }
+  .stance { list-style: none; padding: 0; margin: 0 0 1rem; }
+  .stance li { display: grid; grid-template-columns: minmax(8rem, 11rem) 1fr auto; gap: .75rem; align-items: baseline; padding: .55rem 0; border-top: 1px solid var(--line); }
+  .stance li:first-child { border-top: 0; }
+  .stance .k { color: var(--muted); font-size: .9rem; }
+  .stance .v { font-weight: 600; }
+  .tag { font-size: .78rem; font-weight: 600; padding: .15rem .55rem; border-radius: 999px; white-space: nowrap; }
+  .tag.strong { background: var(--accent); color: var(--accent-ink); }
+  .tag.lean { border: 1.5px solid var(--accent); color: var(--accent); }
+  .tag.split { border: 1.5px solid var(--gold); color: var(--ink); }
+  @media (max-width: 520px) {
+    .stance li { grid-template-columns: 1fr auto; }
+    .stance .k { grid-column: 1 / -1; }
+  }
+  .empty { padding-bottom: 1.25rem; }
+  .empty p { color: var(--muted); }
+</style>
+</head>
+<body>
+<main class="wrap" id="app"></main>
+
+<script>
+/* =========================================================
+   1. SETTINGS: paste your Apps Script web app URL here
+   ========================================================= */
+const CONFIG = {
+  API_URL: 'https://script.google.com/macros/s/AKfycbzeTTHJCopjIZngXSw4i7-naO2qbI8L6XmmCA3lz9rlfB2RfuRkjdtK0JtMs_kTWrRv/exec',
+  GROUP_NAME: 'Project X Investment Plan'
+};
+
+/* =========================================================
+   2. QUESTIONS: edit freely. Types: choice, checkbox, short, paragraph
+   ========================================================= */
+const QUESTIONS = [
+  { id: 'amount', section: 'Contributions', type: 'choice', required: true, other: true,
+    label: 'How much are you comfortable contributing per month?',
+    options: ['KES 2,000', 'KES 5,000', 'KES 10,000', 'KES 20,000'] },
+  { id: 'frequency', section: 'Contributions', type: 'choice', required: true, other: true,
+    label: 'How often should we contribute?',
+    options: ['Monthly', 'Quarterly'] },
+  { id: 'pool_period', section: 'Contributions', type: 'choice', required: true, other: true,
+    label: 'For how long should we pool money before we invest or review progress?',
+    options: ['6 months', '1 year', '2 years', '3 years or more'] },
+  { id: 'start', section: 'Contributions', type: 'choice', required: true, other: true,
+    label: 'When should we start contributing?',
+    options: ['October 2026', 'November 2026', 'January 2027'] },
+
+  { id: 'sacco', section: 'Choosing a SACCO', type: 'paragraph', required: true,
+    label: 'Which SACCO(s) do you propose, and why?' },
+  { id: 'sacco_criteria', section: 'Choosing a SACCO', type: 'checkbox', required: true, other: true,
+    label: 'What matters most to you when choosing a SACCO?',
+    options: ['Dividend and interest rate history', 'Loan multiplier on savings', 'SASRA regulation',
+              'Mobile and digital access', 'Entry fees and minimum share capital', 'Whether we all qualify for membership'] },
+
+  { id: 'target', section: 'Goals and investment direction', type: 'short', required: true,
+    label: 'What should our end-goal target amount be (in KES)?', placeholder: 'e.g. 2,000,000' },
+  { id: 'target_time', section: 'Goals and investment direction', type: 'choice', required: true, other: true,
+    label: 'By when should we aim to reach that target?',
+    options: ['1 year', '2 years', '3 years', '5 years or more'] },
+  { id: 'two_million', section: 'Goals and investment direction', type: 'paragraph', required: true,
+    label: 'Challenge: if we had KES 2 million today, what would you invest it in, and what could it realistically generate for us?' },
+  { id: 'short_term', section: 'Goals and investment direction', type: 'choice', required: true,
+    label: 'Would pursuing a short or medium-term investment alongside our long-term goal help or hurt us?',
+    options: ['It would complement our long-term goal', 'It would distract from our long-term goal', 'Not sure'] },
+  { id: 'short_term_why', section: 'Goals and investment direction', type: 'paragraph', required: false,
+    label: 'Briefly explain your answer above.' },
+
+  { id: 'other_ideas', section: 'Anything else', type: 'paragraph', required: false,
+    label: 'Any other ideas, concerns, or suggestions?' }
+];
+
+/* =========================================================
+   3. App code (no changes needed below)
+   ========================================================= */
+const app = document.getElementById('app');
+const store = {
+  get(k, s) { try { return (s ? sessionStorage : localStorage).getItem(k); } catch (e) { return null; } },
+  set(k, v, s) { try { (s ? sessionStorage : localStorage).setItem(k, v); } catch (e) {} },
+  del(k, s) { try { (s ? sessionStorage : localStorage).removeItem(k); } catch (e) {} }
+};
+
+let pin = store.get('pin', true);
+let respondentId = store.get('rid');
+if (!respondentId) {
+  respondentId = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+  store.set('rid', respondentId);
+}
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function sections() {
+  const out = [];
+  for (const q of QUESTIONS) {
+    let s = out.find(x => x.name === q.section);
+    if (!s) { s = { name: q.section, qs: [] }; out.push(s); }
+    s.qs.push(q);
+  }
+  return out;
+}
+
+async function api(action, extra = {}) {
+  const res = await fetch(CONFIG.API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids a CORS preflight to Apps Script
+    body: JSON.stringify({ action, pin, ...extra })
+  });
+  if (!res.ok) throw new Error('The server replied with status ' + res.status + '.');
+  return res.json();
+}
+
+// Sends the user back to the PIN screen if the PIN stops working.
+function handleAuth(r) {
+  if (r.ok) return true;
+  if (r.code === 'pin' || r.code === 'locked') {
+    store.del('pin', true); pin = null; renderPin(r.error); return false;
+  }
+  throw new Error(r.error || 'Something went wrong.');
+}
+
+/* ---------- PIN screen ---------- */
+function renderPin(msg) {
+  const notConfigured = CONFIG.API_URL.startsWith('PASTE_');
+  app.innerHTML = `
+    <section class="pin">
+      <h1>${esc(CONFIG.GROUP_NAME)}</h1>
+      <p>Enter the group PIN to answer the questions and see everyone's responses.</p>
+      <form id="pinForm">
+        <label for="pinInput">Group PIN</label>
+        <input id="pinInput" class="pin-input" type="password" inputmode="numeric" autocomplete="off" required>
+        <button class="primary" type="submit">Unlock</button>
+        <p class="q-error" role="alert">${notConfigured ? 'Setup needed: add your Apps Script URL to CONFIG.API_URL in index.html.' : esc(msg || '')}</p>
+      </form>
+    </section>`;
+  const input = document.getElementById('pinInput');
+  input.focus();
+  document.getElementById('pinForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    const err = e.target.querySelector('.q-error');
+    pin = input.value.trim();
+    btn.disabled = true; err.textContent = '';
+    try {
+      const r = await api('verify');
+      if (r.ok) { store.set('pin', pin, true); renderShell('answer'); }
+      else { err.textContent = r.error; pin = null; input.select(); }
+    } catch (ex) {
+      err.textContent = 'Could not reach the server. Check your connection and the API URL.';
+    } finally { btn.disabled = false; }
+  });
+}
+
+/* ---------- App shell ---------- */
+function renderShell(tab) {
+  app.innerHTML = `
+    <header class="top">
+      <h1>${esc(CONFIG.GROUP_NAME)}</h1>
+      <div style="display:flex;align-items:center;gap:.5rem">
+        <nav class="tabs" role="tablist" aria-label="Views">
+          <button role="tab" data-tab="answer">My answers</button>
+          <button role="tab" data-tab="results">Group answers</button>
+        </nav>
+        <button class="lock" id="lockBtn">Lock</button>
+      </div>
+    </header>
+    <div id="view"></div>`;
+  app.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+  document.getElementById('lockBtn').addEventListener('click', () => { store.del('pin', true); pin = null; renderPin(); });
+  showTab(tab);
+}
+
+function showTab(tab, justSaved = false) {
+  app.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
+  tab === 'results' ? renderResults(justSaved) : renderAnswer();
+  window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+}
+
+const viewEl = () => document.getElementById('view');
+const errorBox = m => `<div class="error-box" role="alert">${esc(m)}</div>`;
+
+/* ---------- Answer form ---------- */
+function optionsHTML(q, val) {
+  const multi = q.type === 'checkbox';
+  const vals = multi ? (Array.isArray(val) ? val : []) : (val ? [val] : []);
+  const otherPrev = vals.find(v => typeof v === 'string' && v.startsWith('Other: '));
+  const t = multi ? 'checkbox' : 'radio';
+  let h = q.options.map(o => `
+    <label class="opt"><input type="${t}" name="${q.id}" value="${esc(o)}" ${vals.includes(o) ? 'checked' : ''}><span>${esc(o)}</span></label>`).join('');
+  if (q.other) {
+    h += `
+    <label class="opt opt-other"><input type="${t}" name="${q.id}" value="__other" ${otherPrev ? 'checked' : ''}><span>Other</span>
+      <input type="text" class="other-text" data-for="${q.id}" aria-label="Other answer" placeholder="Type your answer"
+        value="${esc(otherPrev ? otherPrev.slice(7) : '')}"></label>`;
+  }
+  return h;
+}
+
+function questionHTML(q, val) {
+  const req = q.required ? '<span class="req" title="Required">*</span>' : '';
+  if (q.type === 'choice' || q.type === 'checkbox') {
+    return `<fieldset class="q" id="q_${q.id}">
+      <legend>${esc(q.label)}${req}</legend>
+      ${q.type === 'checkbox' ? '<p class="help">Choose all that apply.</p>' : ''}
+      <div class="opts">${optionsHTML(q, val)}</div>
+      <p class="q-error" role="alert"></p></fieldset>`;
+  }
+  const field = q.type === 'paragraph'
+    ? `<textarea id="f_${q.id}" name="${q.id}" rows="4">${esc(val || '')}</textarea>`
+    : `<input id="f_${q.id}" name="${q.id}" type="text" value="${esc(val || '')}" ${q.placeholder ? `placeholder="${esc(q.placeholder)}"` : ''}>`;
+  return `<div class="q" id="q_${q.id}">
+    <label class="q-label" for="f_${q.id}">${esc(q.label)}${req}</label>${field}
+    <p class="q-error" role="alert"></p></div>`;
+}
+
+function collect(form) {
+  const answers = {}, missing = [];
+  const otherVal = id => {
+    const t = form.querySelector(`.other-text[data-for="${id}"]`).value.trim();
+    return t ? 'Other: ' + t : '';
+  };
+  for (const q of QUESTIONS) {
+    let v;
+    if (q.type === 'choice') {
+      const sel = form.querySelector(`input[name="${q.id}"]:checked`);
+      if (sel) v = sel.value === '__other' ? otherVal(q.id) : sel.value;
+    } else if (q.type === 'checkbox') {
+      v = [...form.querySelectorAll(`input[name="${q.id}"]:checked`)]
+        .map(i => i.value === '__other' ? otherVal(q.id) : i.value).filter(Boolean);
+      if (!v.length) v = undefined;
+    } else {
+      v = form.elements[q.id].value.trim() || undefined;
+    }
+    if (v !== undefined && v !== '') answers[q.id] = v;
+    else if (q.required) missing.push(q);
+  }
+  return { answers, missing };
+}
+
+async function renderAnswer() {
+  const view = viewEl();
+  view.innerHTML = '<p class="status">Loading your answers…</p>';
+  let mine = null;
+  try {
+    const r = await api('mine', { id: respondentId });
+    if (!handleAuth(r)) return;
+    mine = r.response;
+  } catch (e) { view.innerHTML = errorBox(e.message); return; }
+
+  const a = (mine && mine.answers) || {};
+  view.innerHTML = `
+    <form id="qform" novalidate>
+      <section class="panel">
+        <h2>About you</h2>
+        <div class="q" id="q_name">
+          <label class="q-label" for="f_name">Your name</label>
+          <input id="f_name" type="text" maxlength="60" autocomplete="name" value="${esc(mine && !mine.anonymous ? mine.name : '')}">
+          <label class="opt toggle"><input type="checkbox" id="f_anon" ${mine && mine.anonymous ? 'checked' : ''}>
+            <span>Answer anonymously. Your name will not be saved or shown to anyone.</span></label>
+          <p class="q-error" role="alert" id="name_err"></p>
+        </div>
+      </section>
+      ${sections().map(s => `<section class="panel"><h2>${esc(s.name)}</h2>${s.qs.map(q => questionHTML(q, a[q.id])).join('')}</section>`).join('')}
+      <div class="actions">
+        <button type="submit" class="primary">${mine ? 'Update my answers' : 'Save my answers'}</button>
+        <p class="save-status" role="status"></p>
+      </div>
+    </form>`;
+
+  const form = document.getElementById('qform');
+  const nameInput = document.getElementById('f_name');
+  const anon = document.getElementById('f_anon');
+  const syncAnon = () => { nameInput.disabled = anon.checked; };
+  anon.addEventListener('change', syncAnon); syncAnon();
+
+  // Typing in an "Other" box selects the Other option automatically.
+  form.querySelectorAll('.other-text').forEach(t => t.addEventListener('input', () => {
+    const box = form.querySelector(`input[name="${t.dataset.for}"][value="__other"]`);
+    if (t.value.trim()) box.checked = true;
+  }));
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    form.querySelectorAll('.q-error').forEach(el => el.textContent = '');
+    const name = nameInput.value.trim();
+    let bad = false;
+    if (!anon.checked && !name) { document.getElementById('name_err').textContent = 'Add your name, or tick "Answer anonymously".'; bad = true; }
+    const { answers, missing } = collect(form);
+    missing.forEach(q => { document.querySelector(`#q_${q.id} .q-error`).textContent = 'This question needs an answer.'; });
+    if (bad || missing.length) {
+      const first = form.querySelector('.q-error:not(:empty)');
+      first.closest('.q').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+      return;
+    }
+    const btn = form.querySelector('.primary');
+    const status = form.querySelector('.save-status');
+    btn.disabled = true; status.textContent = 'Saving…';
+    try {
+      const r = await api('submit', { id: respondentId, name: anon.checked ? '' : name, anonymous: anon.checked, answers });
+      if (!handleAuth(r)) return;
+      showTab('results', true);
+      return;
+    } catch (ex) {
+      status.textContent = 'Could not save: ' + ex.message;
+    } finally { btn.disabled = false; }
+  });
+}
+
+/* ---------- Group results ---------- */
+function resultHTML(q, rs) {
+  const answered = rs.filter(x => x.answers && x.answers[q.id] !== undefined && x.answers[q.id] !== '');
+  let body;
+  if (!answered.length) {
+    body = '<p class="muted small">No answers yet.</p>';
+  } else if (q.type === 'choice' || q.type === 'checkbox') {
+    const tally = new Map();
+    for (const x of answered) {
+      const vs = Array.isArray(x.answers[q.id]) ? x.answers[q.id] : [x.answers[q.id]];
+      for (const v of vs) { if (!tally.has(v)) tally.set(v, []); tally.get(v).push(x.name); }
+    }
+    body = [...tally.entries()].sort((a, b) => b[1].length - a[1].length).map(([opt, who]) => {
+      const pct = Math.round(who.length / answered.length * 100);
+      const named = who.filter(Boolean);
+      const anonN = who.length - named.length;
+      const whoTxt = [named.join(', '), anonN ? `${anonN} anonymous` : ''].filter(Boolean).join(', ');
+      return `<div class="bar-row">
+        <div class="bar-head"><span>${esc(opt)}</span><span class="count">${who.length} (${pct}%)</span></div>
+        <div class="bar" aria-hidden="true"><span style="width:${pct}%"></span></div>
+        <p class="who">${esc(whoTxt)}</p></div>`;
+    }).join('');
+  } else {
+    body = `<ul class="quotes">${answered.map(x => `
+      <li><p>${esc(x.answers[q.id])}</p><span class="who">${x.name ? esc(x.name) : 'Anonymous'}</span></li>`).join('')}</ul>`;
+  }
+  const note = q.type === 'checkbox' ? ' People could choose more than one.' : '';
+  return `<div class="rq"><h3>${esc(q.label)}</h3>
+    <p class="muted small">${answered.length} of ${rs.length} answered.${note}</p>${body}</div>`;
+}
+
+/* ---------- Analysis ---------- */
+const SHORT_LABELS = {
+  amount: 'Monthly amount', frequency: 'How often', pool_period: 'Pooling period', start: 'Start date',
+  target_time: 'Time to target', short_term: 'Short-term investment'
+};
+
+// "KES 5,000", "2M", "2 million", "Other: 7500" -> number
+function parseKES(v) {
+  if (v === undefined || v === null) return null;
+  const s = String(v).toLowerCase().replace(/^other:\s*/, '').replace(/kshs?|kes|shillings?|\/=/g, '').replace(/,/g, '').trim();
+  const m = s.match(/(\d+(?:\.\d+)?)\s*(million|mn|m|thousand|k)?\b/);
+  if (!m) return null;
+  let n = parseFloat(m[1]);
+  const u = m[2];
+  if (u === 'k' || u === 'thousand') n *= 1e3;
+  else if (u) n *= 1e6;
+  return n > 0 ? n : null;
+}
+// "6 months", "2 years", "3 years or more" -> months
+function parseMonths(v) {
+  const m = String(v || '').toLowerCase().match(/(\d+(?:\.\d+)?)\s*(month|year|yr)/);
+  if (!m) return null;
+  return m[2].startsWith('month') ? +m[1] : +m[1] * 12;
+}
+const median = a => {
+  if (!a.length) return null;
+  const s = [...a].sort((x, y) => x - y), h = Math.floor(s.length / 2);
+  return s.length % 2 ? s[h] : (s[h - 1] + s[h]) / 2;
+};
+const kes = n => 'KES ' + Math.round(n).toLocaleString('en-KE');
+function duration(months) {
+  if (!isFinite(months) || months <= 0) return 'n/a';
+  months = Math.ceil(months);
+  const y = Math.floor(months / 12), m = months % 12;
+  const parts = [];
+  if (y) parts.push(y + (y === 1 ? ' year' : ' years'));
+  if (m) parts.push(m + (m === 1 ? ' month' : ' months'));
+  return parts.join(' ');
+}
+
+// Leading answer for a pick-one question, with how strongly the group agrees
+function leading(rs, id) {
+  const vals = rs.map(x => x.answers && x.answers[id]).filter(Boolean);
+  if (!vals.length) return null;
+  const counts = {};
+  vals.forEach(v => counts[v] = (counts[v] || 0) + 1);
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const topN = sorted[0][1];
+  const tied = sorted.filter(([, c]) => c === topN).map(([v]) => v);
+  const share = topN / vals.length;
+  let level = share >= 0.75 ? 'strong' : share > 0.5 ? 'lean' : 'split';
+  if (tied.length > 1) level = 'split';
+  return { value: tied.join(' / '), share, level, answered: vals.length };
+}
+
+function analysisHTML(rs) {
+  const n = rs.length;
+  const amounts = rs.map(x => parseKES(x.answers && x.answers.amount)).filter(Boolean);
+  const targets = rs.map(x => parseKES(x.answers && x.answers.target)).filter(Boolean);
+  const floor = amounts.length ? Math.min(...amounts) : null;
+  const mid = median(amounts);
+  const target = median(targets);
+  const period = leading(rs, 'pool_period');
+  const periodMonths = period ? parseMonths(period.value.split(' / ')[0]) : null;
+
+  const stats = [];
+  if (floor) {
+    stats.push([kes(floor * n), `Monthly pot if all ${n} pay ${kes(floor)}, the lowest amount anyone chose`]);
+    if (mid && mid !== floor) stats.push([kes(mid * n), `Monthly pot if all ${n} pay the median choice of ${kes(mid)}`]);
+    if (periodMonths) stats.push([kes(floor * n * periodMonths), `Saved after ${period.value.split(' / ')[0].toLowerCase()} at ${kes(floor)} each`]);
+    if (target) stats.push([duration(target / (floor * n)), `To reach the median target of ${kes(target)} at ${kes(floor)} each`]);
+    stats.push([duration(2e6 / (floor * n)), `To reach the KES 2 million challenge at ${kes(floor)} each`]);
+  }
+
+  const stanceRows = Object.keys(SHORT_LABELS).map(id => {
+    const l = leading(rs, id);
+    if (!l) return '';
+    const tag = { strong: 'Strong agreement', lean: 'Leaning', split: 'Split' }[l.level];
+    return `<li><span class="k">${esc(SHORT_LABELS[id])}</span>
+      <span class="v">${esc(l.value)}</span>
+      <span class="tag ${l.level}" title="${Math.round(l.share * 100)}% of ${l.answered}">${tag}, ${Math.round(l.share * 100)}%</span></li>`;
+  }).join('');
+
+  const splits = Object.keys(SHORT_LABELS).map(id => ({ id, l: leading(rs, id) })).filter(x => x.l && x.l.level === 'split');
+  const toDiscuss = splits.length
+    ? `<p class="lede">Worth discussing next: ${splits.map(x => esc(SHORT_LABELS[x.id].toLowerCase())).join(', ')}.</p>`
+    : '';
+
+  return `<section class="panel analysis">
+    <h2>Where we stand</h2>
+    <p class="lede">Projections are simple totals from everyone's answers. They leave out SACCO dividends, interest and fees.</p>
+    ${stats.length ? `<div class="stats">${stats.map(([v, l]) => `<div class="stat"><div class="stat-value">${esc(v)}</div><p class="stat-label">${esc(l)}</p></div>`).join('')}</div>` : ''}
+    <ul class="stance">${stanceRows}</ul>
+    ${toDiscuss}
+  </section>`;
+}
+
+async function renderResults(justSaved = false) {
+  const view = viewEl();
+  view.innerHTML = '<p class="status">Loading group answers…</p>';
+  let rs;
+  try {
+    const r = await api('results', { id: respondentId });
+    if (r.code === 'not_voted') {
+      view.innerHTML = `<section class="panel empty"><h2>Answer first, then see the group</h2>
+        <p>Group results unlock once you save your own answers, so everyone's views stay independent.</p>
+        <button class="primary" id="goAnswer">Answer the questions</button></section>`;
+      document.getElementById('goAnswer').addEventListener('click', () => showTab('answer'));
+      return;
+    }
+    if (!handleAuth(r)) return;
+    rs = r.responses || [];
+  } catch (e) { view.innerHTML = errorBox(e.message); return; }
+
+  if (!rs.length) {
+    view.innerHTML = `<section class="panel empty"><h2>No answers yet</h2>
+      <p>Answers appear here as soon as someone saves them.</p>
+      <button class="primary" id="goAnswer">Answer the questions</button></section>`;
+    document.getElementById('goAnswer').addEventListener('click', () => showTab('answer'));
+    return;
+  }
+  const anonCount = rs.filter(x => !x.name).length;
+  view.innerHTML = `
+    ${justSaved ? '<div class="notice" role="status">Your answers are saved. Here is where the group stands so far. You can update your answers any time under My answers.</div>' : ''}
+    <div class="summary">
+      <p><strong>${rs.length}</strong> ${rs.length === 1 ? 'person has' : 'people have'} answered${anonCount ? `, ${anonCount} anonymously` : ''}.</p>
+      <button class="ghost" id="refreshBtn">Refresh</button>
+    </div>
+    ${analysisHTML(rs)}
+    ${sections().map(s => `<section class="panel"><h2>${esc(s.name)}</h2>${s.qs.map(q => resultHTML(q, rs)).join('')}</section>`).join('')}`;
+  document.getElementById('refreshBtn').addEventListener('click', () => renderResults(false));
+}
+
+/* ---------- Start ---------- */
+pin ? renderShell('answer') : renderPin();
+</script>
+</body>
+</html>
