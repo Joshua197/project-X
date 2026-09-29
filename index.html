@@ -156,7 +156,7 @@
    ========================================================= */
 const CONFIG = {
   API_URL: 'https://script.google.com/macros/s/AKfycbzeTTHJCopjIZngXSw4i7-naO2qbI8L6XmmCA3lz9rlfB2RfuRkjdtK0JtMs_kTWrRv/exec',
-  GROUP_NAME: 'Project-X: It's Time'
+  GROUP_NAME: 'Our investment plan'
 };
 
 /* =========================================================
@@ -321,13 +321,36 @@ function sections() {
 }
 
 async function api(action, extra = {}) {
-  const res = await fetch(CONFIG.API_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids a CORS preflight to Apps Script
-    body: JSON.stringify({ action, pin, ...extra })
-  });
-  if (!res.ok) throw new Error('The server replied with status ' + res.status + '.');
-  return res.json();
+  const url = CONFIG.API_URL.trim();
+  if (!/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(url)) {
+    throw new Error('The Apps Script URL in index.html is missing or wrong. It should start with https://script.google.com/macros/s/ and end in /exec.');
+  }
+  const body = JSON.stringify({ action, pin, ...extra });
+  let lastErr;
+  // Google's servers occasionally fail a request for no clear reason, so retry twice before giving up.
+  // Every action is safe to repeat (saving overwrites your own row), so retries never create duplicates.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if (attempt) await new Promise(r => setTimeout(r, 800 * attempt));
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // avoids a CORS preflight to Apps Script
+        body,
+        cache: 'no-store'
+      });
+      if (res.ok) {
+        const text = await res.text();
+        try { return JSON.parse(text); }
+        catch (e) { lastErr = new Error('Google replied with a page instead of data. Check the deployment access is set to Anyone.'); continue; }
+      }
+      lastErr = new Error(res.status === 404
+        ? "Google couldn't find the questionnaire backend (404). The deployment may have been archived or the URL may be out of date."
+        : 'Google replied with status ' + res.status + '.');
+    } catch (e) {
+      lastErr = new Error('Could not reach Google. Check your internet connection and try again.');
+    }
+  }
+  throw lastErr;
 }
 
 // Sends the user back to the PIN screen if the PIN stops working.
